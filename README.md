@@ -19,3 +19,5 @@ Data Preparation:
 | triage        |  425087   | 31916 |
 | vitalsign |  1564610   | 198919 |
 | diagnosis | 899050 | 68254 |
+
+We have included the cleaned tables in this repository under the respective `ed` and `icu` folders. 
