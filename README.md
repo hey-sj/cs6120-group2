@@ -55,6 +55,8 @@ We have included the cleaned tables in this repository under the respective `ed`
 
 # 3. Framework
 
+![figure](https://github.com/user-attachments/assets/a8ec38ec-a66a-4392-8b02-93c2dd65d9ed)
+
 **<h3>Preprocessing</h3>**
 
 - **Combining ICD Codes**:
