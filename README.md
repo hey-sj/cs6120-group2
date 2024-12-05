@@ -51,7 +51,7 @@ Data Preparation:
 | vitalsign |  1564610   | 198919 |
 | diagnosis | 899050 | 68254 |
 
-We have included the cleaned tables in this repository under the respective `ed` and `icu` folders. 
+We have included the cleaned tables in this repository under the respective `ed` and `icu` folders. This is **prior to preprocessing**, which we describe below.
 
 # 3. Framework
 
