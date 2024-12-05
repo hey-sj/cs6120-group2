@@ -39,8 +39,11 @@ print("We will now link the ed stays table with the ICU admissions and their cor
 print(merged_ed_icu.head())
 
 
-# In[4]:
+# In[ ]:
 
+
+print("We will now preprocess the emergency department data with our desired features.")
+print("Processing...")
 
 date_format = '%Y-%m-%d %H:%M:%S'
 
@@ -89,7 +92,6 @@ ed_features = merged_features[[
 ]]
 
 # Verify result
-print("We will now preprocess the emergency department data with our desired features.")
 print(ed_features.head())
 
 
@@ -163,8 +165,10 @@ print("After imputing missing values and removing outliers:")
 print(final_data.head())
 
 
-# In[8]:
+# In[ ]:
 
+
+print("Now normalizing data...")
 
 # Prepare ED los data for normalization
 final_data['intime'] = pd.to_datetime(final_data['intime'])
@@ -283,7 +287,7 @@ print("We see that the random forest model outperformed the linear regression mo
 # plt.show()
 
 
-# In[ ]:
+# In[10]:
 
 
 # LSTM
@@ -336,7 +340,7 @@ print(f'LSTM Model MSE: {lstm_mse:.2f}')
 print(f'LSTM Model R-squared: {lstm_r2:.2f}')
 
 
-# In[ ]:
+# In[11]:
 
 
 # Calculate the variance of the target variable
@@ -351,7 +355,7 @@ print(f'Baseline Model MSE: {baseline_mse:.2f}')
 print(f'Baseline Model R2: {baseline_r2:.2f}')
 
 
-# In[ ]:
+# In[12]:
 
 
 print("We will now evaluate the combined model of the random forest and LSTM models:")
@@ -375,14 +379,14 @@ r2_combined = r2_score(y_test[:min_length], combined_predictions)
 print(f'Combined Model R-squared: {r2_combined:.2f}')
 
 
-# In[ ]:
+# In[17]:
 
 
 print("\n")
-print("We see that the random forest model and then the combined model had the best performances per their MSE scores.")
+print("We see that the random forest model and then the combined model had the best performances per their MSE scores.\nThey also outperformed the baseline model.")
 
 
-# In[ ]:
+# In[14]:
 
 
 print("We will now plot the random forest model.")
@@ -399,7 +403,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[ ]:
+# In[15]:
 
 
 print("We will now plot the combined model.")
@@ -417,7 +421,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[ ]:
+# In[16]:
 
 
 print("We will now plot the LSTM model.")
