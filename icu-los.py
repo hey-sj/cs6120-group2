@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[16]:
+# In[1]:
 
 
 import pandas as pd
@@ -10,7 +10,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 
 
-# In[17]:
+# In[2]:
 
 
 #load data
@@ -28,7 +28,7 @@ print(diagnosis.head())
 
 # Following code links emergency department (ED) stays with ICU admissions and their corresponding length of stay (los). The resulting DataFrame is essential for downstream tasks like predictive modeling or analysis of ICU utilization based on ED visit data.
 
-# In[18]:
+# In[3]:
 
 
 # Merge datasets
@@ -39,37 +39,7 @@ print("We will now link the ed stays table with the ICU admissions and their cor
 print(merged_ed_icu.head())
 
 
-# #### Processing Vitals Data
-# In this section, we process the `vitals` data to extract meaningful features that capture both static and dynamic aspects of a patient’s condition during their stay in the emergency department (ED). This approach ensures that the data is prepared for downstream tasks like predictive modeling or analysis. 
-# 
-# #### Why Process Vitals Data This Way?
-# - Static Aggregates for Overall Trends: The vital signs data (`heartrate`, `resprate`, `o2sat`, `sbp`, `dbp`) often includes multiple time-stamped measurements for each `stay_id`. Aggregating these values into a single `mean` value provides a concise summary of the patient's overall condition during their ED stay.
-# - Dynamic Trends for Detailed Insights: Aggregates like mean values can overlook significant temporal trends or changes in a patient’s condition. By calculating the slope of each vital sign over time (using linear regression), we capture these trends, such as:
-#     - Improvement: A patient’s oxygen saturation (o2sat) increases over time.
-#     - Deterioration: A patient’s blood pressure (sbp, dbp) decreases over time.
-#     
-#     These trends are critical for understanding how a patient’s condition evolves and can be strong predictors for downstream analysis (e.g., ICU length of stay).
-# - Combining Aggregates and Trends: Merging the static (mean, represente as _x) and dynamic (slope, represente as _slope) features ensures that both high-level and fine-grained patterns in the data are included for analysis or modeling.
-# 
-# #### Key Steps in the Code:
-# 1. Aggregate Vitals Data: The `groupby` operation on `stay_id` aggregates vital sign measurements for each patient stay, providing static features like mean values for each vital sign.
-# 
-# 2. Calculate Slope for Dynamic Trends: The `calculate_slope` function calculates the rate of change (slope) for each vital sign over time by performing linear regression on the time-stamped data (`charttime`) and the vital sign values.
-# 
-# 3. Merge Vitals and Triage Data: Combines the `vitals_summary` data (static features) with the `triage` data using a left join on `stay_id`. `_x` refers to columns from the `triage` dataset. `_y` refers to columns from the `vitals_summary` dataset, which is the `mean` value.
-# 
-# 4. Merge Static and Dynamic Features: After aggregating static values and calculating dynamic slopes, dynamic (slope) features are merged with other data to create a comprehensive feature set. 
-# 
-# 5. Retain Desired Columns for Further Use: Only the most relevant columns (static aggregates, slopes, and identifiers) are retained for use in downstream analysis.
-
-# I think these can be write in the report.
-# 
-# Benefits of This Approach:
-# - Comprehensive Data Representation: Combining static and dynamic features captures both the overall condition and temporal patterns of a patient’s vitals.
-# - Improved Predictive Power: Trends (slopes) can highlight critical insights that static features alone cannot reveal, such as rapid deterioration or improvement in a patient’s condition.
-# - Cleaner, More Organized Dataset: Aggregating and merging the vitals data ensures that the resulting dataset is ready for machine learning models or statistical analysis.
-
-# In[19]:
+# In[4]:
 
 
 date_format = '%Y-%m-%d %H:%M:%S'
@@ -123,7 +93,7 @@ print("We will now preprocess the emergency department data with our desired fea
 print(ed_features.head())
 
 
-# In[20]:
+# In[5]:
 
 
 #Merge ED features with ICU and Diagnosis Data
@@ -136,7 +106,7 @@ print("We will now merge the emergency department data features with the ICU and
 print(final_data.head())
 
 
-# In[21]:
+# In[6]:
 
 
 # Impute missing values
@@ -159,7 +129,7 @@ numeric_features = ['heartrate_x', 'resprate_x', 'o2sat_x', 'sbp_x', 'dbp_x',
 non_numeric_features = ['icd_combined']
 
 
-# In[22]:
+# In[7]:
 
 
 # Apply the imputation function
@@ -193,7 +163,7 @@ print("After imputing missing values and removing outliers:")
 print(final_data.head())
 
 
-# In[24]:
+# In[8]:
 
 
 # Prepare ED los data for normalization
@@ -233,7 +203,7 @@ print("Final preprocessed data saved to 'preprocessed_data.csv'")
 print(f"Shape of the file: {final_data_normalized.shape}")
 
 
-# In[26]:
+# In[9]:
 
 
 # regression model
@@ -242,6 +212,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
+from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 
 # Load the preprocessed data
@@ -264,7 +235,12 @@ lr_predictions = lr_model.predict(X_test)
 # Calculate the mean squared error
 lr_mse = mean_squared_error(y_test, lr_predictions)
 
+# Calculate the R-squared
+ls_r2 = r2_score(y_test, lr_predictions)
+
 print(f'Linear Regression MSE: {lr_mse:.2f}')
+print(f'Linear Regression R2: {ls_r2:.2f}')
+print('\n')
 
 print("We will now train a random forest model.")
 
@@ -276,9 +252,13 @@ rf_predictions = rf_model.predict(X_test)
 # Calculate the mean squared error
 rf_mse = mean_squared_error(y_test, rf_predictions)
 
-print(f'Random Forest MSE: {rf_mse:.2f}')
+# Calculate the R-squared
+rf_r2 = r2_score(y_test, rf_predictions)
 
-print("We see that the random forest model outperformed the linear regression model.\n We will continue to use the random forest as our regression model.")
+print(f'Random Forest MSE: {rf_mse:.2f}')
+print(f'Random Forest R2: {rf_r2:.2f} \n')
+
+print("We see that the random forest model outperformed the linear regression model.\nWe will continue to use the random forest as our regression model.")
 
 # The commented code tested the effect of the number of trees on the random forest model. Decided on n_estimators = 250 for the final model.
 
@@ -303,7 +283,7 @@ print("We see that the random forest model outperformed the linear regression mo
 # plt.show()
 
 
-# In[27]:
+# In[ ]:
 
 
 # LSTM
@@ -348,10 +328,15 @@ lstm_predictions = lstm_model.predict(X_test_lstm)
 
 # Calculate MSE of LSTM
 lstm_mse = mean_squared_error(y_test_lstm, lstm_predictions)
+
+# Calculate R-Squared of LSTM
+lstm_r2 = r2_score(y_test_lstm, lstm_predictions)
+
 print(f'LSTM Model MSE: {lstm_mse:.2f}')
+print(f'LSTM Model R-squared: {lstm_r2:.2f}')
 
 
-# In[28]:
+# In[ ]:
 
 
 # Calculate the variance of the target variable
@@ -361,10 +346,12 @@ print(f'Variance of the target variable: {target_variance:.2f}')
 # Calculate the MSE of a baseline model (predicting the mean of the target variable)
 baseline_predictions = np.full_like(y_test, np.mean(y_test))
 baseline_mse = mean_squared_error(y_test, baseline_predictions)
+baseline_r2 = r2_score(y_test, baseline_predictions)
 print(f'Baseline Model MSE: {baseline_mse:.2f}')
+print(f'Baseline Model R2: {baseline_r2:.2f}')
 
 
-# In[29]:
+# In[ ]:
 
 
 print("We will now evaluate the combined model of the random forest and LSTM models:")
@@ -395,7 +382,7 @@ print("\n")
 print("We see that the random forest model and then the combined model had the best performances per their MSE scores.")
 
 
-# In[34]:
+# In[ ]:
 
 
 print("We will now plot the random forest model.")
@@ -412,7 +399,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[35]:
+# In[ ]:
 
 
 print("We will now plot the combined model.")
@@ -430,7 +417,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[36]:
+# In[ ]:
 
 
 print("We will now plot the LSTM model.")
